@@ -1,0 +1,21 @@
+version: '3'
+services:
+  database:
+    image: 'postgres:14.1'
+    restart: always
+    env_file:
+      - database.env # configure postgres
+    volumes:
+      - ./pgdata/:/var/lib/postgresql/data/ # persist data even if container shuts down
+    container_name: database
+  drf:
+      build: .
+      command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+      volumes:
+        - ./drf/:/usr/src/itechart_python_lab/
+      ports:
+        - 8000:8000
+      env_file:
+        - .env
+      depends_on:
+        - "database"
